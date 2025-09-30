@@ -63,19 +63,19 @@ jobs:
     - name: Create Azure Storage Account
       run: |
         az storage account create \
-          --name ${{ env.STORAGE_ACCOUNT_NAME }} \
-          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.STAGING_STORAGE_NAME }} \
+          --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
           --location ${{ env.LOCATION }} \
           --sku Standard_LRS
     
     - name: Get Azure Storage Account Credentials
       run: |
         RAW_KEY=$(az storage account keys list \
-          --account-name ${{ env.STORAGE_ACCOUNT_NAME }} \
-          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --account-name ${{ env.STAGING_STORAGE_NAME }} \
+          --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
           --query "[0].value" -o tsv)
 
-        BASE64_NAME=$(echo -n "${{ env.STORAGE_ACCOUNT_NAME }}" | base64 -w0)
+        BASE64_NAME=$(echo -n "${{ env.STAGING_STORAGE_NAME }}" | base64 -w0)
         BASE64_KEY=$(echo -n "$RAW_KEY" | base64 -w0)
 
         echo "BASE64_NAME=$BASE64_NAME" >> $GITHUB_ENV
