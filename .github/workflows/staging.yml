@@ -76,7 +76,7 @@ jobs:
           --query "[0].value" -o tsv)
 
         BASE64_NAME=$(echo -n "${{ env.STAGING_STORAGE_NAME }}" | base64 -w0)
-        BASE64_KEY=$(echo -n "${{ RAW_KEY }}" | base64 -w0)
+        BASE64_KEY=$(echo -n "$RAW_KEY" | base64 -w0)
 
         echo "BASE64_NAME=$BASE64_NAME" >> $GITHUB_ENV
         echo "BASE64_KEY=$BASE64_KEY" >> $GITHUB_ENV

@@ -38,6 +38,7 @@ on:
         type: string
       customer_api_ip:
         required: true
+        type: string
       aks_cluster_name:
         required: true
         type: string
