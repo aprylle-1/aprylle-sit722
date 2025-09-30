@@ -57,7 +57,7 @@ jobs:
         az aks update \
         --name ${{ env.STAGING_CLUSTER_NAME }} \
         --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-        --attach-acr ${{ env.AZURE_CONTAINER_REGISTRY }}
+        --attach-acr sit722devopsacraprylle.azurecr.io
 
     - name: Create Azure Storage Account
       run: |
