@@ -30,6 +30,9 @@ on:
       aks_storage_name:
         required: true
         type: string
+      namespace:
+        required: true
+        type: string
     secrets:
       AZURE_CREDENTIALS:
         required: true
