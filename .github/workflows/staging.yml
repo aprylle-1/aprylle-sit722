@@ -120,6 +120,7 @@ jobs:
       
   delete_staging_environment:
     needs: acceptance_testing
+    runs-on: ubuntu-latest
     if: always()
     steps:
       - name: Delete AKS Cluster
