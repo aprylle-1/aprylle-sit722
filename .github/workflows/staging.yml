@@ -11,17 +11,17 @@ env:
   AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
 
 jobs:
-  # test_and_push_backend:
-  #   uses: ./.github/workflows/backend_ci.yml
-  #   secrets:
-  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-  #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  test_and_push_backend:
+    uses: ./.github/workflows/backend_ci.yml
+    secrets:
+      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+      AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
   
-  # test_and_push_frontend:
-  #   uses: ./.github/workflows/frontend_ci.yml
-  #   secrets:
-  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-  #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  test_and_push_frontend:
+    uses: ./.github/workflows/frontend_ci.yml
+    secrets:
+      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+      AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
   
   create_staging_environment:
     # needs: 
@@ -107,3 +107,16 @@ jobs:
       aks_storage_name: week10storagestaging
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  
+  deploy_frontend:
+    needs: deploy_backend
+    uses: ./.github/workflows/frontend_cd.yml
+    with:
+      product_api_ip: ${{ needs.deploy_backend.outputs.PRODUCT_API_IP }}
+      order_api_ip: ${{ needs.deploy_backend.outputs.ORDER_API_IP }}
+      customer_api_ip: ${{ needs.deploy_backend.outputs.CUSTOMER_API_IP }}
+      aks_cluster_name: 'week10-aks-cluster-staging'
+      aks_resource_group: 'week10-rg-staging'
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
