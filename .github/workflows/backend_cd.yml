@@ -59,7 +59,6 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
-          enable-AzPSSession: true
 
       - name: Set Kubernetes context (get AKS credentials)
         run: |
