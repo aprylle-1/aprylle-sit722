@@ -6,7 +6,7 @@ on:
 env:
   STAGING_CLUSTER_NAME: week10-aks-cluster-staging
   STAGING_RESOURCE_GROUP: week10-rg-staging
-  STAGING_STORAGE_NAME: week10-storage-staging
+  STAGING_STORAGE_NAME: week10storagestaging
   LOCATION: eastus
   AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
 
