@@ -43,7 +43,8 @@ jobs:
         --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
         --name ${{ env.STAGING_CLUSTER_NAME }} \
         --node-count 1 \
-        --node-vm-size Standard_D2s_v3
+        --node-vm-size Standard_D2s_v3 \
+        --generate-ssh-keys
 
     - name: Get AKS Credentials
       run: |
