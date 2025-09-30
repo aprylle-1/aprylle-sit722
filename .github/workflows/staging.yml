@@ -8,7 +8,7 @@ env:
   STAGING_RESOURCE_GROUP: week10-rg-staging
   STAGING_STORAGE_NAME: week10-storage-staging
   LOCATION: eastus
-  AZURE_CONTAINER_REGISTRY: secrets.AZURE_CONTAINER_REGISTRY
+  AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
 
 jobs:
   # test_and_push_backend:
