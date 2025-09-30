@@ -49,5 +49,4 @@ jobs:
         az aks delete \
         --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
         --name ${{ env.STAGING_CLUSTER_NAME }} \
-        --yes \
-        --no-wait
+        --yes
