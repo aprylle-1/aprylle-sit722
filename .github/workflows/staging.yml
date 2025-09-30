@@ -87,3 +87,26 @@ jobs:
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
       AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+  
+  acceptance_testing:
+    needs: deploy_frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Frontend IP Address
+        run: |
+          FRONTEND_IP=$(kubectl get service frontend-w05-aks -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          echo "FRONTEND_IP=$FRONTEND_IP" >> $GITHUB_ENV
+
+      - name: Test Backend Services
+        run: |
+          echo "Testing Product Service at ${{ needs.deploy_backend.outputs.PRODUCT_API_IP }}"
+          curl -f http://${{ needs.deploy_backend.outputs.PRODUCT_API_IP }} || exit 1
+
+          echo "Testing Order Service at ${{ needs.deploy_backend.outputs.ORDER_API_IP }}"
+          curl -f http://${{ needs.deploy_backend.outputs.ORDER_API_IP }} || exit 1
+
+          echo "Testing Customer Service at ${{ needs.deploy_backend.outputs.CUSTOMER_API_IP }}"
+          curl -f http://${{ needs.deploy_backend.outputs.CUSTOMER_API_IP }} || exit 1
+
+          echo "Testing Frontend at $FRONTEND_IP"
+          curl -f http://$FRONTEND_IP || exit 1
