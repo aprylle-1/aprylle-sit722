@@ -94,7 +94,7 @@ jobs:
     #     --name ${{ env.STAGING_CLUSTER_NAME }} \
     #     --yes
   deploy_backend:
-    uses: ./.github/workflows/backend-cd.yml
+    uses: ./.github/workflows/backend_cd.yml
     with:
       aks_cluster_name: $ {{ env.STAGING_CLUSTER_NAME }}
       aks_resource_group: $ {{ env.STAGING_RESOURCE_GROUP }}
