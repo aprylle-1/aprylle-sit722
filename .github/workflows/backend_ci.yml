@@ -1,10 +1,17 @@
 # week10/.github/workflows/ci_workflow.yml
 
-name: Application CI - Test, Build and Push Images to ACR
+name: Backend CI - Test, Build and Push Images to ACR
 
 on:
   #manual trigger
   workflow_dispatch:
+
+  workflow_call:
+    secrets:
+      AZURE_CONTAINER_REGISTRY:
+        required: true
+      AZURE_CREDENTIALS:
+        required: true
 
 jobs:
   test_and_lint_backends:

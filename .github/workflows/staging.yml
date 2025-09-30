@@ -1,0 +1,42 @@
+name: Automated Deployment to Staging Environment
+
+on: 
+  workflow_dispatch:
+
+env:
+  STAGING_CLUSTER_NAME: week10-aks-cluster
+
+jobs:
+  # test_and_push_backend:
+  #   uses: ./.github/workflows/backend_ci.yml
+  #   secrets:
+  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+  #     AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+  
+  # test_and_push_frontend:
+  #   uses: ./.github/workflows/frontend_ci.yml
+  #   secrets:
+  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+  #     AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+  
+  create_staging_environment:
+    # needs: 
+    #   - test_and_push_backend
+    #   - test_and_push_frontend
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+
+    - name: Get AKS Credentials
+      run: az aks create \
+        --resource-group week- \
+        --name ${{ env.STAGING_CLUSTER_NAME }} \
+        --node-count 1 \
+        --node-vm-size Standard_D2s_v3 \
+        --generate-ssh-keys
