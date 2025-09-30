@@ -93,6 +93,9 @@ jobs:
     #     --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
     #     --name ${{ env.STAGING_CLUSTER_NAME }} \
     #     --yes
+    - name: Logout from Azure
+      run: az logout
+  
   deploy_backend:
     needs:
       - create_staging_environment
