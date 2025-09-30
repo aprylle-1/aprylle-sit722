@@ -70,9 +70,9 @@ jobs:
         run: |
           az aks get-credentials --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --overwrite-existing
 
-      - name: Attach ACR
-        run: |
-          az aks update --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --attach-acr ${{ inputs.aks_acr_name || github.event.inputs.aks_acr_name }}
+      # - name: Attach ACR
+      #   run: |
+      #     az aks update --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --attach-acr ${{ inputs.aks_acr_name || github.event.inputs.aks_acr_name }}
 
       - name: Get Azure Storage Account Credentials
         run: |
@@ -96,19 +96,19 @@ jobs:
         run: |
           echo "Deploying backend infrastructure..."
           cd k8s/
-          kubectl apply -f configmaps.yaml
-          kubectl apply -f secrets.yaml
-          kubectl apply -f customer-db.yaml
-          kubectl apply -f product-db.yaml
-          kubectl apply -f order-db.yaml
+          kubectl apply -f configmaps.yaml --namespace=staging
+          kubectl apply -f secrets.yaml --namespace=staging
+          kubectl apply -f customer-db.yaml --namespace=staging
+          kubectl apply -f product-db.yaml --namespace=staging
+          kubectl apply -f order-db.yaml --namespace=staging
 
       - name: Deploy Backend Microservices (Product, Order)
         run: |
           echo "Deploying backend microservices..."
           cd k8s/
-          kubectl apply -f customer-service.yaml
-          kubectl apply -f product-service.yaml
-          kubectl apply -f order-service.yaml
+          kubectl apply -f customer-service.yaml --namespace=staging
+          kubectl apply -f product-service.yaml --namespace=staging
+          kubectl apply -f order-service.yaml --namespace=staging
       
       - name: Wait for Backend LoadBalancer IPs
         run: |
