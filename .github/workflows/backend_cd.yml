@@ -30,7 +30,7 @@ on:
       aks_storage_name:
         required: true
         type: string
-      namespace:
+      aks_namespace:
         required: true
         type: string
     secrets:
@@ -96,19 +96,19 @@ jobs:
         run: |
           echo "Deploying backend infrastructure..."
           cd k8s/
-          kubectl apply -f configmaps.yaml --namespace=staging
-          kubectl apply -f secrets.yaml --namespace=staging
-          kubectl apply -f customer-db.yaml --namespace=staging
-          kubectl apply -f product-db.yaml --namespace=staging
-          kubectl apply -f order-db.yaml --namespace=staging
+          kubectl apply -f configmaps.yaml --namespace=${{ inputs.aks_namespace }}
+          kubectl apply -f secrets.yaml --namespace=${{ inputs.aks_namespace }}
+          kubectl apply -f customer-db.yaml --namespace=${{ inputs.aks_namespace }}
+          kubectl apply -f product-db.yaml --namespace=${{ inputs.aks_namespace }}
+          kubectl apply -f order-db.yaml --namespace=${{ inputs.aks_namespace }}
 
       - name: Deploy Backend Microservices (Product, Order)
         run: |
           echo "Deploying backend microservices..."
           cd k8s/
-          kubectl apply -f customer-service.yaml --namespace=staging
-          kubectl apply -f product-service.yaml --namespace=staging
-          kubectl apply -f order-service.yaml --namespace=staging
+          kubectl apply -f customer-service.yaml --namespace=${{ inputs.aks_namespace }}
+          kubectl apply -f product-service.yaml --namespace=${{ inputs.aks_namespace }}
+          kubectl apply -f order-service.yaml --namespace=${{ inputs.aks_namespace }}
       
       - name: Wait for Backend LoadBalancer IPs
         run: |

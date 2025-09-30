@@ -49,13 +49,13 @@ jobs:
       run: |
           kubectl create namespace staging || echo "Namespace 'staging' already exists"
     
-    - name: Create Azure Storage Account
-      run: |
-        az storage account create \
-          --name ${{ env.STAGING_STORAGE_NAME }} \
-          --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-          --location ${{ env.LOCATION }} \
-          --sku Standard_LRS
+    # - name: Create Azure Storage Account
+    #   run: |
+    #     az storage account create \
+    #       --name ${{ env.STAGING_STORAGE_NAME }} \
+    #       --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+    #       --location ${{ env.LOCATION }} \
+    #       --sku Standard_LRS
 
     - name: Logout from Azure
       run: az logout
@@ -69,7 +69,7 @@ jobs:
       aks_resource_group: week10-rg-staging
       aks_acr_name: sit722devopsacraprylle
       aks_storage_name: week10storagestaging
-      namespace: staging
+      aks_namespace: 'staging'
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
   
@@ -82,7 +82,7 @@ jobs:
       customer_api_ip: ${{ needs.deploy_backend.outputs.CUSTOMER_API_IP }}
       aks_cluster_name: 'week10-aks-cluster'
       aks_resource_group: 'week10-rg-staging'
-      namespace: staging
+      aks_namespace: 'staging'
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
       AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
@@ -119,34 +119,29 @@ jobs:
           echo "Testing Frontend at $FRONTEND_IP"
           curl -f http://${{ env.FRONTEND_IP }}:80 || exit 1
       
-  # delete_staging_environment:
-  #   needs: acceptance_testing
-  #   runs-on: ubuntu-latest
-  #   if: always()
-  #   steps:
-  #     - name: Azure Login
-  #       uses: azure/login@v1
-  #       with:
-  #         creds: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  delete_staging_environment:
+    needs: acceptance_testing
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
 
-  #     - name: Delete AKS Cluster
-  #       run: |
-  #         echo "Deleting AKS Cluster: ${{ env.STAGING_CLUSTER_NAME }}"
-  #         az aks delete \
-  #           --name ${{ env.STAGING_CLUSTER_NAME }} \
-  #           --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-  #           --yes \
-  #           --no-wait
+      - name: Delete AKS Cluster
+        run: kubectl delete namespace staging
 
-  #     - name: Delete Azure Storage Account
-  #       run: |
-  #         echo "Deleting Storage Account: ${{ env.STAGING_STORAGE_NAME }}"
-  #         az storage account delete \
-  #           --name ${{ env.STAGING_STORAGE_NAME }} \
-  #           --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-  #           --yes
+      - name: Delete Azure Storage Account
+        run: |
+          echo "Deleting Storage Account: ${{ env.STAGING_STORAGE_NAME }}"
+          az storage account delete \
+            --name ${{ env.STAGING_STORAGE_NAME }} \
+            --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+            --yes
 
-  #     - name: Logout from Azure
-  #       run: az logout
+      - name: Logout from Azure
+        run: az logout
+    
 
        
