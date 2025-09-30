@@ -37,36 +37,36 @@ jobs:
       with:
         creds: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
 
-    - name: Create AKS Cluster
-      run: | 
-        az aks create \
-        --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-        --name ${{ env.STAGING_CLUSTER_NAME }} \
-        --node-count 1 \
-        --node-vm-size Standard_D2s_v3 \
-        --generate-ssh-keys
+    # - name: Create AKS Cluster
+    #   run: | 
+    #     az aks create \
+    #     --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+    #     --name ${{ env.STAGING_CLUSTER_NAME }} \
+    #     --node-count 1 \
+    #     --node-vm-size Standard_D2s_v3 \
+    #     --generate-ssh-keys
 
-    - name: Get AKS Credentials
-      run: |
-        az aks get-credentials \
-        --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-        --name ${{ env.STAGING_CLUSTER_NAME }} \
-        --overwrite-existing
+    # - name: Get AKS Credentials
+    #   run: |
+    #     az aks get-credentials \
+    #     --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+    #     --name ${{ env.STAGING_CLUSTER_NAME }} \
+    #     --overwrite-existing
     
-    - name: Attach ACR to AKS
-      run: |
-        az aks update \
-        --name ${{ env.STAGING_CLUSTER_NAME }} \
-        --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-        --attach-acr sit722devopsacraprylle
+    # - name: Attach ACR to AKS
+    #   run: |
+    #     az aks update \
+    #     --name ${{ env.STAGING_CLUSTER_NAME }} \
+    #     --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+    #     --attach-acr sit722devopsacraprylle
 
-    - name: Create Azure Storage Account
-      run: |
-        az storage account create \
-          --name ${{ env.STAGING_STORAGE_NAME }} \
-          --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-          --location ${{ env.LOCATION }} \
-          --sku Standard_LRS
+    # - name: Create Azure Storage Account
+    #   run: |
+    #     az storage account create \
+    #       --name ${{ env.STAGING_STORAGE_NAME }} \
+    #       --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+    #       --location ${{ env.LOCATION }} \
+    #       --sku Standard_LRS
     
     - name: Get Azure Storage Account Credentials
       run: |
@@ -93,3 +93,11 @@ jobs:
     #     --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
     #     --name ${{ env.STAGING_CLUSTER_NAME }} \
     #     --yes
+  deploy_backend:
+    uses: ./.github/workflows/backend-cd.yml
+    with:
+      aks_cluster_name: $ {{ env.STAGING_CLUSTER_NAME }}
+      aks_resource_group: $ {{ env.STAGING_RESOURCE_GROUP }}
+      aks_acr_name: sit722devopsacraprylle
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
