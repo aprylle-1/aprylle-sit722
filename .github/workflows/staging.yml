@@ -93,7 +93,7 @@ jobs:
   #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
   
   acceptance_testing:
-    needs: deploy_frontend
+    # needs: deploy_frontend
     runs-on: ubuntu-latest
     steps:
       - name: Get Frontend IP Address
