@@ -50,7 +50,7 @@ jobs:
       run: |
         az aks get-credentials \
         --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-        --name ${{ env.STAGING_CLUSTER_NAME }}
+        --name ${{ env.STAGING_CLUSTER_NAME }} \
         --overwrite-existing
     
     - name: Attach ACR to AKS
