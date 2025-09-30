@@ -67,9 +67,9 @@ jobs:
         run: |
           az aks get-credentials --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --overwrite-existing
 
-      - name: Attach ACR
-        run: |
-          az aks update --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --attach-acr ${{ inputs.aks_acr_name || github.event.inputs.aks_acr_name }}
+      # - name: Attach ACR
+      #   run: |
+      #     az aks update --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --attach-acr ${{ inputs.aks_acr_name || github.event.inputs.aks_acr_name }}
 
       - name: Get Azure Storage Account Credentials
         run: |
@@ -120,7 +120,7 @@ jobs:
             ORDER_IP=$(kubectl get service order-service-w05-aks -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
             CUSTOMER_IP=$(kubectl get service customer-service-w05-aks -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
             
-            if [[ -n "$PRODUCT_IP" && -n "$ORDER_IP" && -n "$CUSTOMER_IP"]]; then
+            if [[ -n "$PRODUCT_IP" && -n "$ORDER_IP" && -n "$CUSTOMER_IP" ]]; then
               echo "All backend LoadBalancer IPs assigned!"
               echo "Product Service IP: $PRODUCT_IP"
               echo "Order Service IP: $ORDER_IP"
