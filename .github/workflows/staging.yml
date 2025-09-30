@@ -113,13 +113,13 @@ jobs:
       - name: Test Backend Services
         run: |
           echo "Testing Product Service at ${{ needs.deploy_backend.outputs.PRODUCT_API_IP }}"
-          curl -f http://${{ needs.deploy_backend.outputs.PRODUCT_API_IP }} || exit 1
+          curl -f http://${{ needs.deploy_backend.outputs.PRODUCT_API_IP }}:8000 || exit 1
 
           echo "Testing Order Service at ${{ needs.deploy_backend.outputs.ORDER_API_IP }}"
-          curl -f http://${{ needs.deploy_backend.outputs.ORDER_API_IP }} || exit 1
+          curl -f http://${{ needs.deploy_backend.outputs.ORDER_API_IP }}:8001 || exit 1
 
           echo "Testing Customer Service at ${{ needs.deploy_backend.outputs.CUSTOMER_API_IP }}"
-          curl -f http://${{ needs.deploy_backend.outputs.CUSTOMER_API_IP }} || exit 1
+          curl -f http://${{ needs.deploy_backend.outputs.CUSTOMER_API_IP }}:8002 || exit 1
 
           echo "Testing Frontend at $FRONTEND_IP"
-          curl -f http://$FRONTEND_IP || exit 1
+          curl -f http://${{ env.FRONTEND_IP }}:80 || exit 1
