@@ -67,9 +67,9 @@ jobs:
         run: |
           az aks get-credentials --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --overwrite-existing
 
-      # - name: Attach ACR
-      #   run: |
-      #     az aks update --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --attach-acr ${{ inputs.aks_acr_name || github.event.inputs.aks_acr_name }}
+      - name: Attach ACR
+        run: |
+          az aks update --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --attach-acr ${{ inputs.aks_acr_name || github.event.inputs.aks_acr_name }}
 
       - name: Get Azure Storage Account Credentials
         run: |
@@ -84,7 +84,7 @@ jobs:
           echo "BASE64_NAME=$BASE64_NAME" >> $GITHUB_ENV
           echo "BASE64_KEY=$BASE64_KEY" >> $GITHUB_ENV
     
-      - name: Inject secrets into manifest
+      - name: Inject Container Secrets Into Manifest Files
         run: |
             sed -i "s|_AZURE_STORAGE_ACCOUNT_NAME_|${{ env.BASE64_NAME }}|g" k8s/secrets.yaml
             sed -i "s|_AZURE_STORAGE_ACCOUNT_KEY_|${{ env.BASE64_KEY }}|g" k8s/secrets.yaml
