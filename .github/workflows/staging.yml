@@ -60,13 +60,13 @@ jobs:
     #     --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
     #     --attach-acr sit722devopsacraprylle
 
-    - name: Create Azure Storage Account
-      run: |
-        az storage account create \
-          --name ${{ env.STAGING_STORAGE_NAME }} \
-          --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-          --location ${{ env.LOCATION }} \
-          --sku Standard_LRS
+    # - name: Create Azure Storage Account
+    #   run: |
+    #     az storage account create \
+    #       --name ${{ env.STAGING_STORAGE_NAME }} \
+    #       --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+    #       --location ${{ env.LOCATION }} \
+    #       --sku Standard_LRS
     
     - name: Get Azure Storage Account Credentials
       run: |
@@ -80,6 +80,11 @@ jobs:
 
         echo "BASE64_NAME=$BASE64_NAME" >> $GITHUB_ENV
         echo "BASE64_KEY=$BASE64_KEY" >> $GITHUB_ENV
+    
+    - name: Inject secrets into manifest
+      run: |
+          sed -i "s|_AZURE_STORAGE_ACCOUNT_NAME_|${{ env.BASE64_NAME }}|g" k8s/secrets.yaml
+          sed -i "s|_AZURE_STORAGE_ACCOUNT_KEY_|${{ env.BASE64_KEY }}|g" k8s/secrets.yaml
 
     # - name: Delete AKS Cluster
     #   if: always()
