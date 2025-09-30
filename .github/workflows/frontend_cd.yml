@@ -77,6 +77,7 @@ jobs:
           # Ensure frontend/main.js is directly in the path for sed
           sed -i "s|_PRODUCT_API_URL_|${{ inputs.product_api_ip }}|g" frontend/main.js
           sed -i "s|_ORDER_API_URL_|${{ inputs.order_api_ip }}|g" frontend/main.js
+          sed -i "s|_CUSTOMER_API_URL_|${{ inputs.customer_api_ip }}|g" frontend/main.js
           
           # Display the modified file content for debugging
           echo "--- Modified main.js content ---"
