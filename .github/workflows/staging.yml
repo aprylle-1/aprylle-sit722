@@ -68,8 +68,8 @@ jobs:
   #     run: az logout
   
   deploy_backend:
-    needs:
-      - create_staging_environment
+    # needs:
+    #   - create_staging_environment
     uses: ./.github/workflows/backend_cd.yml
     with:
       aks_cluster_name: week10-aks-cluster-staging
@@ -93,7 +93,7 @@ jobs:
   #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
   
   acceptance_testing:
-    # needs: deploy_frontend
+    needs: deploy_backend
     runs-on: ubuntu-latest
     steps:
       - name: Azure Login
