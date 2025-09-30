@@ -57,19 +57,13 @@ jobs:
   #         --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
   #         --location ${{ env.LOCATION }} \
   #         --sku Standard_LRS
-  #   # - name: Delete AKS Cluster
-  #   #   if: always()
-  #   #   run: |
-  #   #     az aks delete \
-  #   #     --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-  #   #     --name ${{ env.STAGING_CLUSTER_NAME }} \
-  #   #     --yes
-  #   - name: Logout from Azure
-  #     run: az logout
+
+    # - name: Logout from Azure
+    #   run: az logout
   
   deploy_backend:
-    # needs:
-    #   - create_staging_environment
+    needs:
+      - create_staging_environment
     uses: ./.github/workflows/backend_cd.yml
     with:
       aks_cluster_name: week10-aks-cluster-staging
@@ -110,7 +104,7 @@ jobs:
           FRONTEND_IP=$(kubectl get service frontend-w05-aks -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
           echo "FRONTEND_IP=$FRONTEND_IP" >> $GITHUB_ENV
 
-      - name: Test Backend Services
+      - name: Smoke Testing Frontend and Backend
         run: |
           echo "Testing Product Service at ${{ needs.deploy_backend.outputs.PRODUCT_API_IP }}"
           curl -f http://${{ needs.deploy_backend.outputs.PRODUCT_API_IP }}:8000 || exit 1
@@ -123,3 +117,29 @@ jobs:
 
           echo "Testing Frontend at $FRONTEND_IP"
           curl -f http://${{ env.FRONTEND_IP }}:80 || exit 1
+      
+  delete_staging_environment:
+    needs: acceptance_testing
+    if: always()
+    steps:
+      - name: Delete AKS Cluster
+        run: |
+          echo "Deleting AKS Cluster: ${{ env.STAGING_CLUSTER_NAME }}"
+          az aks delete \
+            --name ${{ env.STAGING_CLUSTER_NAME }} \
+            --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+            --yes \
+            --no-wait
+
+      - name: Delete Azure Storage Account
+        run: |
+          echo "Deleting Storage Account: ${{ env.STAGING_STORAGE_NAME }}"
+          az storage account delete \
+            --name ${{ env.STAGING_STORAGE_NAME }} \
+            --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+            --yes
+
+      - name: Logout from Azure
+        run: az logout
+
+       
