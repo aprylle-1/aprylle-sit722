@@ -34,11 +34,20 @@ jobs:
       with:
         creds: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
 
-    - name: Create AKS Cluster
-      run: | 
-        az aks create \
+    # - name: Create AKS Cluster
+    #   run: | 
+    #     az aks create \
+    #     --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+    #     --name ${{ env.STAGING_CLUSTER_NAME }} \
+    #     --node-count 1 \
+    #     --node-vm-size Standard_D2s_v3 \
+    #     --generate-ssh-keys
+
+    - name: Delete AKS Cluster
+      if: always()
+      run: |
+        az aks delete \
         --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
         --name ${{ env.STAGING_CLUSTER_NAME }} \
-        --node-count 1 \
-        --node-vm-size Standard_D2s_v3 \
-        --generate-ssh-keys
+        --yes \
+        --no-wait
