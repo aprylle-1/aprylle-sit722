@@ -4,8 +4,10 @@ on:
   workflow_dispatch:
 
 env:
-  STAGING_CLUSTER_NAME: week10-aks-cluster
+  STAGING_CLUSTER_NAME: week10-aks-cluster-staging
   STAGING_RESOURCE_GROUP: week10-rg-staging
+  STAGING_STORAGE_NAME: week10-storage-staging
+  LOCATION: eastus
 
 jobs:
   # test_and_push_backend:
@@ -34,19 +36,53 @@ jobs:
       with:
         creds: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
 
-    # - name: Create AKS Cluster
-    #   run: | 
-    #     az aks create \
-    #     --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-    #     --name ${{ env.STAGING_CLUSTER_NAME }} \
-    #     --node-count 1 \
-    #     --node-vm-size Standard_D2s_v3 \
-    #     --generate-ssh-keys
-
-    - name: Delete AKS Cluster
-      if: always()
-      run: |
-        az aks delete \
+    - name: Create AKS Cluster
+      run: | 
+        az aks create \
         --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
         --name ${{ env.STAGING_CLUSTER_NAME }} \
-        --yes
+        --node-count 1 \
+        --node-vm-size Standard_D2s_v3 \
+        --generate-ssh-keys
+
+    - name: Get AKS Credentials
+      run: |
+        az aks get-credentials \
+        --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+        --name ${{ env.STAGING_CLUSTER_NAME }}
+    
+    - name: Attach ACR to AKS
+      run: |
+        az aks update \
+        --name ${{ env.STAGING_CLUSTER_NAME }} \
+        --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+        --attach-acr ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+
+    - name: Create Azure Storage Account
+      run: |
+        az storage account create \
+          --name ${{ env.STORAGE_ACCOUNT_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --location ${{ env.LOCATION }} \
+          --sku Standard_LRS
+    
+    - name: Get Azure Storage Account Credentials
+      run: |
+        RAW_KEY=$(az storage account keys list \
+          --account-name ${{ env.STORAGE_ACCOUNT_NAME }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --query "[0].value" -o tsv)
+
+        BASE64_NAME=$(echo -n "${{ env.STORAGE_ACCOUNT_NAME }}" | base64 -w0)
+        BASE64_KEY=$(echo -n "$RAW_KEY" | base64 -w0)
+
+        echo "BASE64_NAME=$BASE64_NAME" >> $GITHUB_ENV
+        echo "BASE64_KEY=$BASE64_KEY" >> $GITHUB_ENV
+
+    # - name: Delete AKS Cluster
+    #   if: always()
+    #   run: |
+    #     az aks delete \
+    #     --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+    #     --name ${{ env.STAGING_CLUSTER_NAME }} \
+    #     --yes
