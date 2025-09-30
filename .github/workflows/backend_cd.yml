@@ -67,45 +67,45 @@ jobs:
         run: |
           az aks get-credentials --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --overwrite-existing
 
-      - name: Attach ACR
-        run: |
-          az aks update --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --attach-acr ${{ inputs.aks_acr_name || github.event.inputs.aks_acr_name }}
+      # - name: Attach ACR
+      #   run: |
+      #     az aks update --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --attach-acr ${{ inputs.aks_acr_name || github.event.inputs.aks_acr_name }}
 
-      - name: Get Azure Storage Account Credentials
-        run: |
-          RAW_KEY=$(az storage account keys list \
-            --account-name ${{ inputs.aks_storage_name || github.event.inputs.aks_storage_name }} \
-            --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} \
-            --query "[0].value" -o tsv)
+      # - name: Get Azure Storage Account Credentials
+      #   run: |
+      #     RAW_KEY=$(az storage account keys list \
+      #       --account-name ${{ inputs.aks_storage_name || github.event.inputs.aks_storage_name }} \
+      #       --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} \
+      #       --query "[0].value" -o tsv)
 
-          BASE64_NAME=$(echo -n "${{ inputs.aks_storage_name || github.event.inputs.aks_storage_name }}" | base64 -w0)
-          BASE64_KEY=$(echo -n "$RAW_KEY" | base64 -w0)
+      #     BASE64_NAME=$(echo -n "${{ inputs.aks_storage_name || github.event.inputs.aks_storage_name }}" | base64 -w0)
+      #     BASE64_KEY=$(echo -n "$RAW_KEY" | base64 -w0)
 
-          echo "BASE64_NAME=$BASE64_NAME" >> $GITHUB_ENV
-          echo "BASE64_KEY=$BASE64_KEY" >> $GITHUB_ENV
+      #     echo "BASE64_NAME=$BASE64_NAME" >> $GITHUB_ENV
+      #     echo "BASE64_KEY=$BASE64_KEY" >> $GITHUB_ENV
     
-      - name: Inject Container Secrets Into Manifest Files
-        run: |
-            sed -i "s|_AZURE_STORAGE_ACCOUNT_NAME_|${{ env.BASE64_NAME }}|g" k8s/secrets.yaml
-            sed -i "s|_AZURE_STORAGE_ACCOUNT_KEY_|${{ env.BASE64_KEY }}|g" k8s/secrets.yaml
+      # - name: Inject Container Secrets Into Manifest Files
+      #   run: |
+      #       sed -i "s|_AZURE_STORAGE_ACCOUNT_NAME_|${{ env.BASE64_NAME }}|g" k8s/secrets.yaml
+      #       sed -i "s|_AZURE_STORAGE_ACCOUNT_KEY_|${{ env.BASE64_KEY }}|g" k8s/secrets.yaml
       
-      - name: Deploy Backend Infrastructure (Namespace, ConfigMaps, Secrets, Databases)
-        run: |
-          echo "Deploying backend infrastructure..."
-          cd k8s/
-          kubectl apply -f configmaps.yaml
-          kubectl apply -f secrets.yaml
-          kubectl apply -f customer-db.yaml
-          kubectl apply -f product-db.yaml
-          kubectl apply -f order-db.yaml
+      # - name: Deploy Backend Infrastructure (Namespace, ConfigMaps, Secrets, Databases)
+      #   run: |
+      #     echo "Deploying backend infrastructure..."
+      #     cd k8s/
+      #     kubectl apply -f configmaps.yaml
+      #     kubectl apply -f secrets.yaml
+      #     kubectl apply -f customer-db.yaml
+      #     kubectl apply -f product-db.yaml
+      #     kubectl apply -f order-db.yaml
 
-      - name: Deploy Backend Microservices (Product, Order)
-        run: |
-          echo "Deploying backend microservices..."
-          cd k8s/
-          kubectl apply -f customer-service.yaml
-          kubectl apply -f product-service.yaml
-          kubectl apply -f order-service.yaml
+      # - name: Deploy Backend Microservices (Product, Order)
+      #   run: |
+      #     echo "Deploying backend microservices..."
+      #     cd k8s/
+      #     kubectl apply -f customer-service.yaml
+      #     kubectl apply -f product-service.yaml
+      #     kubectl apply -f order-service.yaml
       
       - name: Wait for Backend LoadBalancer IPs
         run: |

@@ -67,17 +67,17 @@ jobs:
   #   - name: Logout from Azure
   #     run: az logout
   
-  # deploy_backend:
-  #   needs:
-  #     - create_staging_environment
-  #   uses: ./.github/workflows/backend_cd.yml
-  #   with:
-  #     aks_cluster_name: week10-aks-cluster-staging
-  #     aks_resource_group: week10-rg-staging
-  #     aks_acr_name: sit722devopsacraprylle
-  #     aks_storage_name: week10storagestaging
-  #   secrets:
-  #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  deploy_backend:
+    needs:
+      - create_staging_environment
+    uses: ./.github/workflows/backend_cd.yml
+    with:
+      aks_cluster_name: week10-aks-cluster-staging
+      aks_resource_group: week10-rg-staging
+      aks_acr_name: sit722devopsacraprylle
+      aks_storage_name: week10storagestaging
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
   
   # deploy_frontend:
   #   needs: deploy_backend
