@@ -2,6 +2,10 @@ name: Automated Deployment to Staging Environment
 
 on: 
   workflow_dispatch:
+  
+  push:
+    branches:
+      - testing
 
 env:
   STAGING_CLUSTER_NAME: week10-aks-cluster-staging
@@ -11,82 +15,82 @@ env:
   AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
 
 jobs:
-  test_and_push_backend:
-    uses: ./.github/workflows/backend_ci.yml
-    secrets:
-      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-      AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  # test_and_push_backend:
+  #   uses: ./.github/workflows/backend_ci.yml
+  #   secrets:
+  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+  #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
   
-  test_and_push_frontend:
-    uses: ./.github/workflows/frontend_ci.yml
-    secrets:
-      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-      AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  # test_and_push_frontend:
+  #   uses: ./.github/workflows/frontend_ci.yml
+  #   secrets:
+  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+  #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
   
-  create_staging_environment:
-    needs: 
-      - test_and_push_backend
-      - test_and_push_frontend
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+  # create_staging_environment:
+  #   needs: 
+  #     - test_and_push_backend
+  #     - test_and_push_frontend
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout repository
+  #     uses: actions/checkout@v4
 
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  #   - name: Azure Login
+  #     uses: azure/login@v1
+  #     with:
+  #       creds: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
 
-    - name: Create AKS Cluster
-      run: | 
-        az aks create \
-        --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-        --name ${{ env.STAGING_CLUSTER_NAME }} \
-        --node-count 1 \
-        --node-vm-size Standard_D2s_v3 \
-        --generate-ssh-keys
+  #   - name: Create AKS Cluster
+  #     run: | 
+  #       az aks create \
+  #       --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+  #       --name ${{ env.STAGING_CLUSTER_NAME }} \
+  #       --node-count 1 \
+  #       --node-vm-size Standard_D2s_v3 \
+  #       --generate-ssh-keys
 
-    - name: Create Azure Storage Account
-      run: |
-        az storage account create \
-          --name ${{ env.STAGING_STORAGE_NAME }} \
-          --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-          --location ${{ env.LOCATION }} \
-          --sku Standard_LRS
-    # - name: Delete AKS Cluster
-    #   if: always()
-    #   run: |
-    #     az aks delete \
-    #     --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
-    #     --name ${{ env.STAGING_CLUSTER_NAME }} \
-    #     --yes
-    - name: Logout from Azure
-      run: az logout
+  #   - name: Create Azure Storage Account
+  #     run: |
+  #       az storage account create \
+  #         --name ${{ env.STAGING_STORAGE_NAME }} \
+  #         --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+  #         --location ${{ env.LOCATION }} \
+  #         --sku Standard_LRS
+  #   # - name: Delete AKS Cluster
+  #   #   if: always()
+  #   #   run: |
+  #   #     az aks delete \
+  #   #     --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+  #   #     --name ${{ env.STAGING_CLUSTER_NAME }} \
+  #   #     --yes
+  #   - name: Logout from Azure
+  #     run: az logout
   
-  deploy_backend:
-    needs:
-      - create_staging_environment
-    uses: ./.github/workflows/backend_cd.yml
-    with:
-      aks_cluster_name: week10-aks-cluster-staging
-      aks_resource_group: week10-rg-staging
-      aks_acr_name: sit722devopsacraprylle
-      aks_storage_name: week10storagestaging
-    secrets:
-      AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  # deploy_backend:
+  #   needs:
+  #     - create_staging_environment
+  #   uses: ./.github/workflows/backend_cd.yml
+  #   with:
+  #     aks_cluster_name: week10-aks-cluster-staging
+  #     aks_resource_group: week10-rg-staging
+  #     aks_acr_name: sit722devopsacraprylle
+  #     aks_storage_name: week10storagestaging
+  #   secrets:
+  #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
   
-  deploy_frontend:
-    needs: deploy_backend
-    uses: ./.github/workflows/frontend_cd.yml
-    with:
-      product_api_ip: ${{ needs.deploy_backend.outputs.PRODUCT_API_IP }}
-      order_api_ip: ${{ needs.deploy_backend.outputs.ORDER_API_IP }}
-      customer_api_ip: ${{ needs.deploy_backend.outputs.CUSTOMER_API_IP }}
-      aks_cluster_name: 'week10-aks-cluster-staging'
-      aks_resource_group: 'week10-rg-staging'
-    secrets:
-      AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
-      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+  # deploy_frontend:
+  #   needs: deploy_backend
+  #   uses: ./.github/workflows/frontend_cd.yml
+  #   with:
+  #     product_api_ip: ${{ needs.deploy_backend.outputs.PRODUCT_API_IP }}
+  #     order_api_ip: ${{ needs.deploy_backend.outputs.ORDER_API_IP }}
+  #     customer_api_ip: ${{ needs.deploy_backend.outputs.CUSTOMER_API_IP }}
+  #     aks_cluster_name: 'week10-aks-cluster-staging'
+  #     aks_resource_group: 'week10-rg-staging'
+  #   secrets:
+  #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
   
   acceptance_testing:
     needs: deploy_frontend
