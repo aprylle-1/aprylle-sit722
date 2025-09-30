@@ -27,6 +27,9 @@ on:
       aks_acr_name:
         required: true
         type: string
+      aks_storage_name:
+        required: true
+        type: string
     secrets:
       AZURE_CREDENTIALS:
         required: true
@@ -68,6 +71,24 @@ jobs:
         run: |
           az aks update --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --attach-acr ${{ inputs.aks_acr_name || github.event.inputs.aks_acr_name }}
 
+      - name: Get Azure Storage Account Credentials
+        run: |
+          RAW_KEY=$(az storage account keys list \
+            --account-name ${{ env.STAGING_STORAGE_NAME }} \
+            --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+            --query "[0].value" -o tsv)
+
+          BASE64_NAME=$(echo -n "${{ env.STAGING_STORAGE_NAME }}" | base64 -w0)
+          BASE64_KEY=$(echo -n "$RAW_KEY" | base64 -w0)
+
+          echo "BASE64_NAME=$BASE64_NAME" >> $GITHUB_ENV
+          echo "BASE64_KEY=$BASE64_KEY" >> $GITHUB_ENV
+    
+      - name: Inject secrets into manifest
+        run: |
+            sed -i "s|_AZURE_STORAGE_ACCOUNT_NAME_|${{ env.BASE64_NAME }}|g" k8s/secrets.yaml
+            sed -i "s|_AZURE_STORAGE_ACCOUNT_KEY_|${{ env.BASE64_KEY }}|g" k8s/secrets.yaml
+      
       - name: Deploy Backend Infrastructure (Namespace, ConfigMaps, Secrets, Databases)
         run: |
           echo "Deploying backend infrastructure..."
