@@ -101,8 +101,8 @@ jobs:
       - create_staging_environment
     uses: ./.github/workflows/backend_cd.yml
     with:
-      aks_cluster_name: $ {{ env.STAGING_CLUSTER_NAME }}
-      aks_resource_group: $ {{ env.STAGING_RESOURCE_GROUP }}
+      aks_cluster_name: ${{ env.STAGING_CLUSTER_NAME }}
+      aks_resource_group: ${{ env.STAGING_RESOURCE_GROUP }}
       aks_acr_name: sit722devopsacraprylle
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
