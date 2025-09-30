@@ -5,6 +5,7 @@ on:
 
 env:
   STAGING_CLUSTER_NAME: week10-aks-cluster
+  STAGING_RESOURCE_GROUP: week10-rg-staging
 
 jobs:
   # test_and_push_backend:
@@ -35,7 +36,7 @@ jobs:
 
     - name: Get AKS Credentials
       run: az aks create \
-        --resource-group week- \
+        --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
         --name ${{ env.STAGING_CLUSTER_NAME }} \
         --node-count 1 \
         --node-vm-size Standard_D2s_v3 \
