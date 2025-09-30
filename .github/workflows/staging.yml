@@ -96,6 +96,15 @@ jobs:
     # needs: deploy_frontend
     runs-on: ubuntu-latest
     steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+
+      - name: Set Kubernetes context (get AKS credentials)
+        run: |
+          az aks get-credentials --resource-group ${{ env.STAGING_RESOURCE_GROUP }} --name ${{ env.STAGING_CLUSTER_NAME }} --overwrite-existing
+
       - name: Get Frontend IP Address
         run: |
           FRONTEND_IP=$(kubectl get service frontend-w05-aks -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
