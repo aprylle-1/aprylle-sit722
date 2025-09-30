@@ -62,8 +62,8 @@ jobs:
     #   run: az logout
   
   deploy_backend:
-    needs:
-      - create_staging_environment
+    # needs:
+    #   - create_staging_environment
     uses: ./.github/workflows/backend_cd.yml
     with:
       aks_cluster_name: week10-aks-cluster-staging
