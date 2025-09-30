@@ -65,7 +65,7 @@ jobs:
       - create_staging_environment
     uses: ./.github/workflows/backend_cd.yml
     with:
-      aks_cluster_name: week10-aks-cluster-staging
+      aks_cluster_name: week10-aks-cluster
       aks_resource_group: week10-rg-staging
       aks_acr_name: sit722devopsacraprylle
       aks_storage_name: week10storagestaging
@@ -80,7 +80,7 @@ jobs:
       product_api_ip: ${{ needs.deploy_backend.outputs.PRODUCT_API_IP }}
       order_api_ip: ${{ needs.deploy_backend.outputs.ORDER_API_IP }}
       customer_api_ip: ${{ needs.deploy_backend.outputs.CUSTOMER_API_IP }}
-      aks_cluster_name: 'week10-aks-cluster-staging'
+      aks_cluster_name: 'week10-aks-cluster'
       aks_resource_group: 'week10-rg-staging'
       namespace: staging
     secrets:
