@@ -74,11 +74,11 @@ jobs:
       - name: Get Azure Storage Account Credentials
         run: |
           RAW_KEY=$(az storage account keys list \
-            --account-name ${{ github.event.inputs.aks_storage_name }} \
-            --resource-group ${{ github.event.inputs.aks_resource_group }} \
+            --account-name ${{ inputs.aks_storage_name || github.event.inputs.aks_storage_name }} \
+            --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} \
             --query "[0].value" -o tsv)
 
-          BASE64_NAME=$(echo -n "${{ github.event.inputs.aks_storage_name }}" | base64 -w0)
+          BASE64_NAME=$(echo -n "${{ inputs.aks_storage_name || github.event.inputs.aks_storage_name }}" | base64 -w0)
           BASE64_KEY=$(echo -n "$RAW_KEY" | base64 -w0)
 
           echo "BASE64_NAME=$BASE64_NAME" >> $GITHUB_ENV
