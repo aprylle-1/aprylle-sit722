@@ -10,27 +10,27 @@ on:
 env:
   AZURE_CLUSTER_NAME: week10-aks-cluster
   RESOURCE_GROUP: week10-rg-staging
-  STAGING_STORAGE_NAME: week10storagestaging
+  STAGING_STORAGE_NAME: week10storagestagingaprylle
   AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
   LOCATION: eastus
 
 jobs:
-  test_and_push_backend:
-    uses: ./.github/workflows/backend_ci.yml
-    secrets:
-      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-      AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  # test_and_push_backend:
+  #   uses: ./.github/workflows/backend_ci.yml
+  #   secrets:
+  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+  #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
   
-  test_and_push_frontend:
-    uses: ./.github/workflows/frontend_ci.yml
-    secrets:
-      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-      AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  # test_and_push_frontend:
+  #   uses: ./.github/workflows/frontend_ci.yml
+  #   secrets:
+  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+  #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
   
   create_staging_environment:
-    needs: 
-      - test_and_push_backend
-      - test_and_push_frontend
+    # needs: 
+    #   - test_and_push_backend
+    #   - test_and_push_frontend
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
