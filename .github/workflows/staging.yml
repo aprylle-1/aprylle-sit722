@@ -43,7 +43,7 @@ jobs:
 
     - name: Set Kubernetes context (get AKS credentials)
       run: |
-          az aks get-credentials --resource-group ${{ env.STAGING_RESOURCE_GROUP }} --name ${{ env.AZURE_CLUSTER_NAME }} --overwrite-existing
+          az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AZURE_CLUSTER_NAME }} --overwrite-existing
     
     - name: Create Staging Namespace
       run: |
@@ -53,7 +53,7 @@ jobs:
       run: |
         az storage account create \
           --name ${{ env.STAGING_STORAGE_NAME }} \
-          --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
           --location ${{ env.LOCATION }} \
           --sku Standard_LRS
 
@@ -98,7 +98,7 @@ jobs:
 
       - name: Set Kubernetes context (get AKS credentials)
         run: |
-          az aks get-credentials --resource-group ${{ env.STAGING_RESOURCE_GROUP }} --name ${{ env.AZURE_CLUSTER_NAME }} --overwrite-existing
+          az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AZURE_CLUSTER_NAME }} --overwrite-existing
 
       - name: Get Frontend IP Address From Staging Namespace
         run: |
@@ -131,7 +131,7 @@ jobs:
       
   #     - name: Set Kubernetes context (get AKS credentials)
   #       run: |
-  #         az aks get-credentials --resource-group ${{ env.STAGING_RESOURCE_GROUP }} --name ${{ env.AZURE_CLUSTER_NAME }} --overwrite-existing
+  #         az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AZURE_CLUSTER_NAME }} --overwrite-existing
 
   #     - name: Delete AKS Cluster
   #       run: kubectl delete namespace staging
@@ -141,7 +141,7 @@ jobs:
   #         echo "Deleting Storage Account: ${{ env.STAGING_STORAGE_NAME }}"
   #         az storage account delete \
   #           --name ${{ env.STAGING_STORAGE_NAME }} \
-  #           --resource-group ${{ env.STAGING_RESOURCE_GROUP }} \
+  #           --resource-group ${{ env.RESOURCE_GROUP }} \
   #           --yes
 
   #     - name: Logout from Azure
