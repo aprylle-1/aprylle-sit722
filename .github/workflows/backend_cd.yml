@@ -30,6 +30,9 @@ on:
       aks_storage_name:
         required: true
         type: string
+      aks_namespace:
+        required: true
+        type: string
     secrets:
       AZURE_CREDENTIALS:
         required: true
@@ -67,10 +70,6 @@ jobs:
         run: |
           az aks get-credentials --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --overwrite-existing
 
-      - name: Attach ACR
-        run: |
-          az aks update --name ${{ inputs.aks_cluster_name || github.event.inputs.aks_cluster_name }} --resource-group ${{ inputs.aks_resource_group || github.event.inputs.aks_resource_group }} --attach-acr ${{ inputs.aks_acr_name || github.event.inputs.aks_acr_name }}
-
       - name: Get Azure Storage Account Credentials
         run: |
           RAW_KEY=$(az storage account keys list \
@@ -93,19 +92,19 @@ jobs:
         run: |
           echo "Deploying backend infrastructure..."
           cd k8s/
-          kubectl apply -f configmaps.yaml
-          kubectl apply -f secrets.yaml
-          kubectl apply -f customer-db.yaml
-          kubectl apply -f product-db.yaml
-          kubectl apply -f order-db.yaml
+          kubectl apply -f configmaps.yaml --namespace=${{ inputs.aks_namespace }}
+          kubectl apply -f secrets.yaml --namespace=${{ inputs.aks_namespace }}
+          kubectl apply -f customer-db.yaml --namespace=${{ inputs.aks_namespace }}
+          kubectl apply -f product-db.yaml --namespace=${{ inputs.aks_namespace }}
+          kubectl apply -f order-db.yaml --namespace=${{ inputs.aks_namespace }}
 
       - name: Deploy Backend Microservices (Product, Order)
         run: |
           echo "Deploying backend microservices..."
           cd k8s/
-          kubectl apply -f customer-service.yaml
-          kubectl apply -f product-service.yaml
-          kubectl apply -f order-service.yaml
+          kubectl apply -f customer-service.yaml --namespace=${{ inputs.aks_namespace }}
+          kubectl apply -f product-service.yaml --namespace=${{ inputs.aks_namespace }}
+          kubectl apply -f order-service.yaml --namespace=${{ inputs.aks_namespace }}
       
       - name: Wait for Backend LoadBalancer IPs
         run: |
@@ -116,9 +115,9 @@ jobs:
           
           for i in $(seq 1 60); do
             echo "Attempt $i/60 to get IPs..."
-            PRODUCT_IP=$(kubectl get service product-service-w05-aks -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-            ORDER_IP=$(kubectl get service order-service-w05-aks -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-            CUSTOMER_IP=$(kubectl get service customer-service-w05-aks -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+            PRODUCT_IP=$(kubectl get service product-service-w05-aks -n ${{ inputs.aks_namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
+            ORDER_IP=$(kubectl get service order-service-w05-aks -n ${{ inputs.aks_namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
+            CUSTOMER_IP=$(kubectl get service customer-service-w05-aks -n ${{ inputs.aks_namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)
             
             if [[ -n "$PRODUCT_IP" && -n "$ORDER_IP" && -n "$CUSTOMER_IP" ]]; then
               echo "All backend LoadBalancer IPs assigned!"

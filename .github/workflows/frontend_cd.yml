@@ -45,6 +45,9 @@ on:
       aks_resource_group:
         required: true
         type: string
+      aks_namespace:
+        required: true
+        type: string
     secrets:
       AZURE_CREDENTIALS:
         required: true
@@ -101,7 +104,7 @@ jobs:
           echo "Deploying frontend with latest tag to AKS cluster: ${{ inputs.aks_cluster_name }}"
           cd k8s/
           # Ensure frontend-service.yaml is configured with your ACR
-          kubectl apply -f frontend.yaml
+          kubectl apply -f frontend.yaml --namespace=${{ inputs.aks_namespace }}
 
       - name: Logout from Azure (AKS deployment)
         run: az logout
