@@ -15,17 +15,6 @@ env:
   LOCATION: eastus
 
 jobs:
-  # test_and_push_backend:
-  #   uses: ./.github/workflows/backend_ci.yml
-  #   secrets:
-  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-  #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
-  
-  # test_and_push_frontend:
-  #   uses: ./.github/workflows/frontend_ci.yml
-  #   secrets:
-  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-  #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
   deploy_backend:
     uses: ./.github/workflows/backend_cd.yml
     with:
@@ -82,5 +71,3 @@ jobs:
 
           echo "Testing Frontend at $FRONTEND_IP"
           curl -f http://${{ env.FRONTEND_IP }}:80 || exit 1
-
-#test to prod
