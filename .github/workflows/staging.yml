@@ -15,22 +15,22 @@ env:
   LOCATION: eastus
 
 jobs:
-  # test_and_push_backend:
-  #   uses: ./.github/workflows/backend_ci.yml
-  #   secrets:
-  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-  #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  test_and_push_backend:
+    uses: ./.github/workflows/backend_ci.yml
+    secrets:
+      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+      AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
   
-  # test_and_push_frontend:
-  #   uses: ./.github/workflows/frontend_ci.yml
-  #   secrets:
-  #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
-  #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  test_and_push_frontend:
+    uses: ./.github/workflows/frontend_ci.yml
+    secrets:
+      AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
+      AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
   
   create_staging_environment:
-    # needs: 
-    #   - test_and_push_backend
-    #   - test_and_push_frontend
+    needs: 
+      - test_and_push_backend
+      - test_and_push_frontend
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -121,33 +121,33 @@ jobs:
           echo "Testing Frontend at $FRONTEND_IP"
           curl -f http://${{ env.FRONTEND_IP }}:80 || exit 1
       
-  # delete_staging_environment:
-  #   needs: acceptance_testing
-  #   runs-on: ubuntu-latest
-  #   if: always()
-  #   steps:
-  #     - name: Azure Login
-  #       uses: azure/login@v1
-  #       with:
-  #         creds: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
+  delete_staging_environment:
+    needs: acceptance_testing
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
       
-  #     - name: Set Kubernetes context (get AKS credentials)
-  #       run: |
-  #         az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AZURE_CLUSTER_NAME }} --overwrite-existing
+      - name: Set Kubernetes context (get AKS credentials)
+        run: |
+          az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AZURE_CLUSTER_NAME }} --overwrite-existing
 
-  #     - name: Delete AKS Cluster
-  #       run: kubectl delete namespace staging
+      - name: Delete AKS Cluster
+        run: kubectl delete namespace staging
 
-  #     - name: Delete Azure Storage Account
-  #       run: |
-  #         echo "Deleting Storage Account: ${{ env.STAGING_STORAGE_NAME }}"
-  #         az storage account delete \
-  #           --name ${{ env.STAGING_STORAGE_NAME }} \
-  #           --resource-group ${{ env.RESOURCE_GROUP }} \
-  #           --yes
+      - name: Delete Azure Storage Account
+        run: |
+          echo "Deleting Storage Account: ${{ env.STAGING_STORAGE_NAME }}"
+          az storage account delete \
+            --name ${{ env.STAGING_STORAGE_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --yes
 
-  #     - name: Logout from Azure
-  #       run: az logout
+      - name: Logout from Azure
+        run: az logout
     
 
        
