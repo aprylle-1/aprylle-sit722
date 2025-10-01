@@ -47,8 +47,9 @@ jobs:
     
     - name: Create Staging Namespace
       run: |
-          kubectl delete namespace staging --ignore-not-found
-          kubectl create namespace staging || echo "Namespace 'staging' already exists"
+        kubectl delete namespace staging --ignore-not-found
+        kubectl wait --for=delete namespace/staging --timeout=120s || true
+        kubectl create namespace staging
     
     - name: Create Azure Storage Account
       run: |
