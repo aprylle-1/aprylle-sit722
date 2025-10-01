@@ -26,42 +26,7 @@ jobs:
   #   secrets:
   #     AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
   #     AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
-  
-  deploy_to_production:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
-
-    - name: Set Kubernetes context (get AKS credentials)
-      run: |
-          az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.AZURE_CLUSTER_NAME }} --overwrite-existing
-    
-    - name: Create Staging Namespace
-      run: |
-        kubectl delete namespace staging --ignore-not-found
-        kubectl wait --for=delete namespace/staging --timeout=120s || true
-        kubectl create namespace staging
-    
-    - name: Create Azure Storage Account
-      run: |
-        az storage account create \
-          --name ${{ env.STAGING_STORAGE_NAME }} \
-          --resource-group ${{ env.RESOURCE_GROUP }} \
-          --location ${{ env.LOCATION }} \
-          --sku Standard_LRS
-
-    - name: Logout from Azure
-      run: az logout
-  
   deploy_backend:
-    needs:
-      - create_staging_environment
     uses: ./.github/workflows/backend_cd.yml
     with:
       aks_cluster_name: 'week10-aks-cluster'
