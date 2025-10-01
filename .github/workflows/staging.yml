@@ -69,7 +69,7 @@ jobs:
       aks_cluster_name: 'week10-aks-cluster'
       aks_resource_group: 'week10-rg-staging'
       aks_acr_name: 'sit722devopsacraprylle'
-      aks_storage_name: 'week10storagestaging'
+      aks_storage_name: 'week10storagestagingaj'
       aks_namespace: 'staging'
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.STAGING_AZURE_CREDENTIALS }}
