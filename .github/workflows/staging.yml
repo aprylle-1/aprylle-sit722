@@ -10,7 +10,7 @@ on:
 env:
   AZURE_CLUSTER_NAME: week10-aks-cluster
   RESOURCE_GROUP: week10-rg-staging
-  STAGING_STORAGE_NAME: week10storagestagingaprylle
+  STAGING_STORAGE_NAME: week10storagestagingaj
   AZURE_CONTAINER_REGISTRY: ${{ secrets.AZURE_CONTAINER_REGISTRY }}
   LOCATION: eastus
 
@@ -47,6 +47,7 @@ jobs:
     
     - name: Create Staging Namespace
       run: |
+          kubectl delete namespace staging \
           kubectl create namespace staging || echo "Namespace 'staging' already exists"
     
     - name: Create Azure Storage Account
@@ -67,7 +68,7 @@ jobs:
     with:
       aks_cluster_name: 'week10-aks-cluster'
       aks_resource_group: 'week10-rg-staging'
-      aks_acr_name: 'sit722devopsacraj'
+      aks_acr_name: 'sit722devopsacraprylle'
       aks_storage_name: 'week10storagestaging'
       aks_namespace: 'staging'
     secrets:
